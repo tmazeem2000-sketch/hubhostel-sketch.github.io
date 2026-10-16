@@ -1,585 +1,93 @@
-<!DOCTYPE html>
-<html lang="en">
+<!doctype html>
+<html lang="ml">
 <head>
-<meta charset="utf-8">
-<style>
-:root{--p:#1e3a8a;--p-tx:#1e3a8a;--p-soft:#e0e7ff;--bg:#f1f5f9;--card:#fff;--surface:#fff;--hover:#f8fafc;--tx:#0f172a;--mut:#64748b;--line:#e2e8f0;
---in:#15803d;--in-bg:#dcfce7;--out:#dc2626;--out-bg:#fee2e2;--gray:#475569;--gray-bg:#e2e8f0;--wa:#25d366;
---msg-bg:#f0fdf4;--msg-line:#bbf7d0;--warn-bg:#fef3c7;--warn-tx:#92400e;--toast:#0f172a;--veil:rgba(255,255,255,.45)}
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{height:100%;margin:0;background:var(--bg);color:var(--tx);font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:15px}
-button,input,select,textarea{font:inherit;color:inherit}
-button{cursor:pointer}
-[hidden]{display:none!important}
-button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #fbbf24;outline-offset:2px}
-
-#login{min-height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--p);color:#fff;padding:24px 16px;text-align:center}
-#login h1{font-size:20px;margin:6px 0 4px;letter-spacing:.02em}
-#login p{margin:0 0 22px;opacity:.8}
-#pinDots{font-size:28px;letter-spacing:10px;height:40px;margin-bottom:18px}
-.pad{display:grid;grid-template-columns:repeat(3,72px);gap:14px}
-.pad button{height:72px;border-radius:50%;border:0;background:rgba(255,255,255,.14);color:#fff;font-size:26px;font-weight:600}
-.pad button:active{background:rgba(255,255,255,.32)}
-.pad .ok{background:#fbbf24;color:var(--p)}
-
-header{position:sticky;top:0;z-index:5;background:var(--p);color:#fff;padding:12px 14px;display:flex;align-items:center;gap:8px}
-header h1{font-size:16px;margin:0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.who{font-size:12px;background:rgba(255,255,255,.16);padding:4px 10px;border-radius:99px;max-width:40%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.icon-btn{border:0;background:rgba(255,255,255,.16);color:#fff;border-radius:8px;padding:6px 10px;font-size:16px}
-main{padding:12px 12px 96px;max-width:720px;margin:0 auto}
-nav{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--line);display:flex;z-index:5;padding-bottom:env(safe-area-inset-bottom)}
-nav button{flex:1;border:0;background:none;padding:8px 2px 10px;font-size:11px;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px}
-nav button span{font-size:20px}
-nav button.on{color:var(--p-tx);font-weight:700}
-
-.stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
-.stat{background:var(--card);border-radius:14px;padding:12px;text-align:center;border:1px solid var(--line)}
-.stat b{display:block;font-size:26px;font-variant-numeric:tabular-nums}
-.stat.in b{color:var(--in)} .stat.out b{color:var(--out)}
-.stat span{font-size:12px;color:var(--mut)}
-.filters{display:flex;gap:8px;margin-top:10px}
-.hcards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
-.hcard{background:var(--card);border:2px solid var(--line);border-radius:14px;padding:12px;text-align:left;width:100%}
-.hcard.on{border-color:var(--p);background:var(--p-soft)}
-.hcard .hn{font-size:13px;font-weight:700;color:var(--p-tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.nums{display:flex;gap:14px;margin-top:6px}
-.nums b{display:block;font-size:24px;line-height:1.1;font-variant-numeric:tabular-nums}
-.nums .i b{color:var(--in)} .nums .o b{color:var(--out)}
-.nums span{font-size:11px;color:var(--mut)}
-.live{font-size:12px;color:var(--mut);margin:8px 2px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--in);animation:pulse 2s infinite}
-@keyframes pulse{50%{opacity:.3}}
-@media (prefers-reduced-motion:reduce){.dot{animation:none}}
-.pick{display:grid;gap:8px;margin-top:10px}
-.pick button{display:flex;justify-content:space-between;align-items:center;padding:14px;border:2px solid var(--line);border-radius:12px;background:var(--surface);font-weight:700;font-size:15px;text-align:left}
-.pick button span{font-size:12px;color:var(--mut);font-weight:400}
-.badge.MOVE{background:var(--warn-bg);color:var(--warn-tx)}
-.search{width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:16px}
-.filters .search{flex:1;min-width:0}
-.sel{padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:14px;max-width:45%}
-.chips{display:flex;gap:8px;margin:10px 0;overflow-x:auto}
-.chips button{border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:6px 14px;white-space:nowrap}
-.chips button.on{background:var(--p);color:#fff;border-color:var(--p)}
-.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px}
-.card.tap:active{background:var(--hover)}
-.card .main{flex:1;min-width:0}
-.card .t{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card .s{font-size:12px;color:var(--mut);margin-top:2px}
-.badge{font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px;white-space:nowrap;letter-spacing:.03em}
-.badge.IN{background:var(--in-bg);color:var(--in)}
-.badge.OUT{background:var(--out-bg);color:var(--out)}
-.badge.ADMIT,.badge.H{background:var(--p-soft);color:var(--p-tx)}
-.badge.VACATE{background:var(--gray-bg);color:var(--gray)}
-.row-btns{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
-.row-btns button{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600}
-.row-btns .adm{color:var(--p-tx);border-color:var(--p-tx)}
-.row-btns .vac{color:var(--out);border-color:var(--out)}
-.toolbar{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap}
-.btn{display:block;width:100%;text-align:center;text-decoration:none;border:0;border-radius:12px;padding:14px;font-weight:700;font-size:16px;background:var(--p);color:#fff;margin-top:10px}
-.btn.sm{display:inline-block;width:auto;padding:10px 14px;font-size:14px;margin:0}
-.btn.ghost{background:var(--surface);color:var(--p-tx);border:1px solid var(--line)}
-.btn.wa{background:var(--wa);color:#053b1e}
-.btn.done{opacity:.55}
-.btn.red{background:var(--out)} .btn.green{background:var(--in)}
-.empty{text-align:center;color:var(--mut);padding:30px 10px}
-.sub{color:var(--mut);font-size:13px;margin-bottom:10px}
-
-#ov{position:fixed;inset:0;background:rgba(15,23,42,.5);z-index:20;display:flex;align-items:flex-end;justify-content:center}
-#sheet{background:var(--surface);width:100%;max-width:560px;max-height:92%;overflow:auto;border-radius:20px 20px 0 0;padding:18px 18px calc(18px + env(safe-area-inset-bottom));animation:up .18s}
-@keyframes up{from{transform:translateY(40px);opacity:.5}}
-@media (prefers-reduced-motion:reduce){#sheet{animation:none}}
-#sheet h3{margin:0 0 4px;font-size:18px}
-label{display:block;font-size:13px;color:var(--mut);margin:12px 0 4px}
-.inp{width:100%;padding:12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);font-size:16px}
-textarea.inp{min-height:130px;resize:vertical}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
-.seg button{padding:14px 6px;border-radius:12px;border:2px solid var(--line);background:var(--surface);font-weight:700;font-size:15px}
-.seg button.on.OUT{border-color:var(--out);background:var(--out-bg);color:var(--out)}
-.seg button.on.IN{border-color:var(--in);background:var(--in-bg);color:var(--in)}
-.msg{white-space:pre-wrap;background:var(--msg-bg);border:1px solid var(--msg-line);border-radius:12px;padding:12px;font-size:14px}
-.note{font-size:12px;color:var(--mut);margin-top:6px}
-.warn{background:var(--warn-bg);color:var(--warn-tx);border-radius:12px;padding:10px 12px;font-size:13px;margin:10px 0}
-
-#toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:var(--toast);color:#fff;padding:10px 16px;border-radius:10px;font-size:14px;z-index:40;max-width:90%;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s}
-#toast.show{opacity:1} #toast.err{background:var(--out)}
-#busy{position:fixed;inset:0;background:var(--veil);z-index:30;display:flex;align-items:center;justify-content:center}
-.spin{width:38px;height:38px;border:4px solid var(--line);border-top-color:var(--p);border-radius:50%;animation:s 1s linear infinite}
-@keyframes s{to{transform:rotate(360deg)}}
-</style>
+  <meta charset="utf-8">
+  <script>
+    /* ▼▼▼ നിങ്ങളുടെ പുതിയ Apps Script Web App URL ഇവിടെ paste ചെയ്യുക ▼▼▼ */
+    const APP_URL = "https://script.google.com/macros/s/AKfycbys-O5_akbReO5vXMwJat6hcfXwtbKxoXYdd8bmMdZmnHfvhabs79YPA9P8h6v63ZuS/exec";
+    /* ▲▲▲ ഇത് മാത്രം മാറ്റിയാൽ മതി ▲▲▲ */
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HOSTEL LOG 2026–27</title>
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Hostel Log 2026–27">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #1e3a8a; overflow: hidden; }
+    #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+    #loader {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      background: #1e3a8a; color: #fff; font-family: system-ui, sans-serif;
+      transition: opacity .4s; z-index: 10;
+    }
+    #loader img { width: 96px; height: 96px; border-radius: 22px; }
+    .spin { width: 32px; height: 32px; border: 4px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%; animation: s 1s linear infinite; }
+    @keyframes s { to { transform: rotate(360deg); } }
+    .screen { display: none; position: fixed; inset: 0; z-index: 20; flex-direction: column;
+      align-items: center; justify-content: center; font-family: system-ui, sans-serif;
+      text-align: center; padding: 24px; background: #fff; }
+    .screen button { margin-top: 16px; padding: 12px 24px; font-size: 16px; border: 0;
+      border-radius: 8px; background: #1e3a8a; color: #fff; }
+  </style>
 </head>
 <body>
+  <div id="loader">
+    <img src="icon-192.png" alt="">
+    <div style="font-weight:600;font-size:18px">HOSTEL LOG 2026–27</div>
+    <div class="spin"></div>
+  </div>
 
-<!-- ===== LOGIN ===== -->
-<div id="login" hidden>
-  <div style="font-size:46px">🏠</div>
-  <h1>HOSTEL LOG 2026–27</h1>
-  <p>Enter your PIN</p>
-  <div id="pinDots"></div>
-  <div class="pad" id="pad"></div>
-</div>
+  <div id="offline" class="screen">
+    <div style="font-size:48px">📶</div>
+    <h2>ഇന്റർനെറ്റ് ഇല്ല</h2>
+    <p>കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കൂ.</p>
+    <button onclick="location.reload()">വീണ്ടും ശ്രമിക്കൂ</button>
+  </div>
 
-<!-- ===== APP ===== -->
-<div id="app" hidden>
-  <header>
-    <h1 id="hTitle"></h1>
-    <span class="who" id="who"></span>
-    <button class="icon-btn" onclick="refresh()" title="Refresh" aria-label="Refresh">⟳</button>
-    <button class="icon-btn" onclick="logout()" title="Log out" aria-label="Log out">🚪</button>
-  </header>
+  <div id="nourl" class="screen">
+    <div style="font-size:48px">⚙️</div>
+    <h2>App URL ചേർത്തിട്ടില്ല</h2>
+    <p>index.html-ൽ APP_URL എന്ന സ്ഥലത്ത് Apps Script Web App ലിങ്ക് paste ചെയ്യുക.</p>
+  </div>
 
-  <main>
-    <!-- Log (everyone) -->
-    <section id="tab-log">
-      <div class="hcards" id="hCards"></div>
-      <div class="live" id="live"></div>
-      <div class="filters">
-        <input class="search" id="q" placeholder="🔍 Search Roll No or name" autocomplete="off">
-        <select class="sel" id="qBatch" aria-label="Batch"></select>
-      </div>
-      <div class="chips" id="flt">
-        <button data-f="all" class="on">All</button>
-        <button data-f="IN">In</button>
-        <button data-f="OUT">Out</button>
-      </div>
-      <div id="list"></div>
-    </section>
+  <iframe id="app" title="HOSTEL LOG 2026–27"
+    allow="clipboard-read; clipboard-write; fullscreen"></iframe>
 
-    <!-- Students (admin) -->
-    <section id="tab-students" hidden>
-      <div class="toolbar">
-        <button class="btn sm" onclick="admitManySheet()">🏠 Admit to hostel</button>
-        <button class="btn sm ghost admin-only" onclick="editStudent('')">➕ Add student</button>
-        <button class="btn sm ghost admin-only" onclick="importSheet()">📥 Import</button>
-      </div>
-      <div class="filters">
-        <input class="search" id="sq" placeholder="🔍 Roll No, name or number" autocomplete="off">
-        <select class="sel" id="sBatch" aria-label="Batch"></select>
-      </div>
-      <div class="chips" id="sflt"></div>
-      <div id="sList"></div>
-    </section>
-
-    <!-- Staff (admin) -->
-    <section id="tab-staff" hidden>
-      <div class="toolbar"><button class="btn sm" onclick="editStaff('')">➕ Add staff</button></div>
-      <div id="stList"></div>
-    </section>
-
-    <!-- Report (admin) -->
-    <section id="tab-logs" hidden>
-      <div class="filters" style="margin-top:0">
-        <input type="date" class="inp" id="lDate" onchange="loadLogs()" aria-label="Date" style="flex:1;min-width:0">
-        <select class="sel" id="lHostel" onchange="renderLogs()" aria-label="Hostel"></select>
-      </div>
-      <div style="height:10px"></div>
-      <div id="lList"></div>
-    </section>
-
-    <!-- Settings (admin) -->
-    <section id="tab-settings" hidden>
-      <label for="setName">App name (title of every message)</label>
-      <input class="inp" id="setName" maxlength="60">
-      <label for="setHostels">Hostels (one per line)</label>
-      <textarea class="inp" id="setHostels" style="min-height:80px"></textarea>
-      <label for="setReasons">Reasons for going out (one per line)</label>
-      <textarea class="inp" id="setReasons"></textarea>
-      <button class="btn" onclick="saveSettings()">Save</button>
-      <div class="note" style="margin-top:14px">All data is stored in your Google Sheet (Students, Logs and Staff tabs).</div>
-    </section>
-  </main>
-
-  <nav id="nav">
-    <button data-t="log"><span>📝</span>Log</button>
-    <button data-t="students"><span>🎓</span>Students</button>
-    <button data-t="staff" class="admin-only"><span>👥</span>Staff</button>
-    <button data-t="logs" class="admin-only"><span>📋</span>Report</button>
-    <button data-t="settings" class="admin-only"><span>⚙️</span>Settings</button>
-  </nav>
-</div>
-
-<div id="ov" hidden><div id="sheet"></div></div>
-<div id="busy" hidden><div class="spin"></div></div>
-<div id="toast" role="status"></div>
-
-<script>
-const $ = s => document.querySelector(s);
-const $$ = s => Array.from(document.querySelectorAll(s));
-let T = null, D = null, TAB = 'log', FLT = 'all', SFLT = 'all', HF = 'all', STAFF = [], LOGS = [], LASTUP = '', pin = '';
-
-/* ---------- utils ---------- */
-function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-const store={
-  get(k){try{return localStorage.getItem(k)}catch(e){return null}},
-  set(k,v){try{localStorage.setItem(k,v)}catch(e){}},
-  del(k){try{localStorage.removeItem(k)}catch(e){}}
-};
-function toast(m,err){const t=$('#toast');t.textContent=m;t.className='show'+(err?' err':'');clearTimeout(t._h);t._h=setTimeout(()=>t.className='',err?4000:2200);}
-function busy(on){$('#busy').hidden=!on;}
-function cleanErr(e){return String((e&&e.message)||e).replace(/^(Script)?Error:\s*/,'').replace(/^Exception:\s*/,'');}
-function call(fn,...a){
-  return new Promise((res,rej)=>{
-    google.script.run.withSuccessHandler(res).withFailureHandler(e=>{
-      const m=cleanErr(e);
-      if(m.indexOf('SESSION_EXPIRED')>=0){logout(true);rej(new Error('Please log in again.'));return;}
-      rej(new Error(m));
-    })[fn](...a);
-  });
-}
-async function run(fn,...a){busy(true);try{const r=await call(fn,...a);$('#toast').className='';return r;}catch(e){toast(e.message,true);throw e;}finally{busy(false);}}
-function openSheet(h){$('#sheet').innerHTML=h;$('#ov').hidden=false;}
-function closeSheet(){$('#ov').hidden=true;$('#sheet').innerHTML='';}
-$('#ov').addEventListener('click',e=>{if(e.target.id==='ov')closeSheet();});
-function confirmBox(title,text,yes,fn,cls){
-  openSheet(`<h3>${esc(title)}</h3><div class="sub">${esc(text)}</div>
-  <button class="btn ${cls||'red'}" id="cfYes">${esc(yes)}</button><button class="btn ghost" onclick="closeSheet()">Cancel</button>`);
-  $('#cfYes').onclick=()=>{closeSheet();fn();};
-}
-function matches(s,q){q=q.trim().toLowerCase();return !q||s.roll.toLowerCase().indexOf(q)>=0||s.name.toLowerCase().indexOf(q)>=0;}
-function today(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
-function copyText(t){
-  const fb=()=>{const x=document.createElement('textarea');x.value=t;document.body.appendChild(x);x.select();
-    try{document.execCommand('copy');toast('Copied');}catch(e){toast('Could not copy. Select the text and copy it.',true);}x.remove();};
-  if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>toast('Copied')).catch(fb);else fb();
-}
-function fillBatches(sel,list){
-  const cur=sel.value, b=[...new Set(list.map(s=>s.batch).filter(Boolean))].sort();
-  sel.innerHTML='<option value="">All batches</option>'+b.map(x=>`<option${x===cur?' selected':''}>${esc(x)}</option>`).join('');
-}
-function residents(){return D.students.filter(s=>s.hostel);}
-function short(h){return String(h||'').replace(/\s*hostel$/i,'')||h;}
-function stamp(){const d=new Date();LASTUP=d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});}
-
-/* ---------- login ---------- */
-['1','2','3','4','5','6','7','8','9','del','0','ok'].forEach(k=>{
-  const b=document.createElement('button');
-  b.textContent=k==='del'?'⌫':k==='ok'?'✓':k;
-  b.setAttribute('aria-label',k==='del'?'Delete':k==='ok'?'Log in':k);
-  if(k==='ok')b.className='ok';
-  b.onclick=()=>pinKey(k);
-  $('#pad').appendChild(b);
-});
-document.addEventListener('keydown',e=>{
-  if($('#login').hidden)return;
-  if(/^\d$/.test(e.key))pinKey(e.key);else if(e.key==='Backspace')pinKey('del');else if(e.key==='Enter')pinKey('ok');
-});
-function pinKey(k){
-  if(k==='del')pin=pin.slice(0,-1);
-  else if(k==='ok'){doLogin();return;}
-  else if(pin.length<8)pin+=k;
-  renderPin();
-}
-function renderPin(){$('#pinDots').textContent=pin?'●'.repeat(pin.length):'○ ○ ○ ○';}
-async function doLogin(){
-  if(pin.length<4){toast('PIN must be at least 4 digits.',true);return;}
-  const p=pin;pin='';renderPin();
-  try{const r=await run('login',p);T=r.token;store.set('hl_token',T);start(r.data,r.defaultPin);}catch(e){}
-}
-function showLogin(){$('#app').hidden=true;$('#login').hidden=false;pin='';renderPin();}
-function logout(expired){
-  if(T){try{google.script.run.logout(T);}catch(e){}}
-  T=null;D=null;store.del('hl_token');closeSheet();showLogin();
-  if(expired===true)toast('Your session ended. Please log in again.',true);
-}
-
-/* ---------- app ---------- */
-function start(data,warn){
-  D=data;stamp();
-  $('#login').hidden=true;$('#app').hidden=false;
-  $('#hTitle').textContent=D.hostelName;
-  $('#who').textContent=(D.role==='Admin'?'👑 ':'👤 ')+D.name;
-  const admin=D.role==='Admin';
-  $$('.admin-only').forEach(el=>el.hidden=!admin);
-  $('#sq').placeholder=admin?'🔍 Roll No, name or number':'🔍 Search Roll No or name';
-  show('log');
-  if(warn)setTimeout(()=>toast('Change the default PIN 1234 now: Staff tab → Admin.',true),400);
-}
-$$('#nav button').forEach(b=>b.onclick=()=>show(b.dataset.t));
-function show(tab){
-  if(D.role!=='Admin'&&tab!=='students')tab='log';
-  TAB=tab;
-  $$('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===tab));
-  $$('main>section').forEach(s=>s.hidden=s.id!=='tab-'+tab);
-  ({log:renderLog,students:renderStudents,staff:loadStaff,logs:loadLogs,settings:renderSettings})[tab]();
-  window.scrollTo(0,0);
-}
-async function refresh(silent){
-  if(!T)return;
-  try{
-    const d=silent?await call('getData',T):await run('getData',T);
-    D=d;stamp();$('#hTitle').textContent=D.hostelName;
-    if(TAB==='log')renderLog();else if(TAB==='students')renderStudents();
-    if(!silent)toast('Updated');
-  }catch(e){}
-}
-function autoRefresh(){if(D&&TAB==='log'&&$('#ov').hidden&&document.visibilityState==='visible')refresh(true);}
-setInterval(autoRefresh,30000);
-document.addEventListener('visibilitychange',autoRefresh);
-function updateStudent(st){const i=D.students.findIndex(x=>x.roll===st.roll);if(i>=0)D.students[i]=Object.assign(D.students[i],st);}
-
-/* ---------- Log tab ---------- */
-$('#q').addEventListener('input',renderLog);
-$('#qBatch').addEventListener('change',renderLog);
-$$('#flt button').forEach(b=>b.onclick=()=>{FLT=b.dataset.f;$$('#flt button').forEach(x=>x.classList.toggle('on',x===b));renderLog();});
-function renderLog(){
-  const st=residents(), out=st.filter(s=>s.status==='OUT').length;
-  if(HF!=='all'&&D.hostels.indexOf(HF)<0)HF='all';
-  $('#hCards').innerHTML=D.hostels.map(h=>{
-    const r=st.filter(s=>s.hostel===h),o=r.filter(s=>s.status==='OUT').length;
-    return `<button class="hcard${HF===h?' on':''}" data-hf="${esc(h)}" aria-pressed="${HF===h}"><div class="hn">${esc(h)}</div>
-      <div class="nums"><div class="i"><b>${r.length-o}</b><span>In</span></div><div class="o"><b>${o}</b><span>Out</span></div><div><b>${r.length}</b><span>Total</span></div></div></button>`;
-  }).join('');
-  $('#live').innerHTML=`<span class="dot"></span><span>Live · All hostels: <b>${st.length-out}</b> in, <b>${out}</b> out, ${st.length} total · updated ${esc(LASTUP)}</span>`;
-  const pool=HF==='all'?st:st.filter(s=>s.hostel===HF);
-  fillBatches($('#qBatch'),pool);
-  const bt=$('#qBatch').value;
-  let list=pool.filter(s=>matches(s,$('#q').value)&&(!bt||s.batch===bt)&&(FLT==='all'||s.status===FLT));
-  const total=list.length;list=list.slice(0,150);
-  $('#list').innerHTML=list.length
-    ? list.map(s=>`<div class="card tap" data-roll="${esc(s.roll)}"><div class="main">
-        <div class="t">${esc(s.name)}</div>
-        <div class="s">Roll ${esc(s.roll)}${s.batch?' · '+esc(s.batch):''}${HF==='all'&&D.hostels.length>1?' · '+esc(short(s.hostel)):''}${s.last?' · '+esc(s.last):''}</div></div>
-        <span class="badge ${s.status}">${s.status==='OUT'?'OUT':'IN'}</span></div>`).join('')
-      +(total>150?`<div class="empty">${total-150} more. Search to find them.</div>`:'')
-    : `<div class="empty">${st.length?'No matching students.':'No students in the hostel yet. Admit them from the Students tab.'}</div>`;
-}
-$('#list').addEventListener('click',e=>{const c=e.target.closest('[data-roll]');if(c)openLog(c.dataset.roll);});
-$('#hCards').addEventListener('click',e=>{const c=e.target.closest('[data-hf]');if(!c)return;HF=HF===c.dataset.hf?'all':c.dataset.hf;renderLog();});
-
-function openLog(roll){
-  const s=D.students.find(x=>x.roll===roll);if(!s)return;
-  let LT=s.status==='OUT'?'IN':'OUT';
-  openSheet(`<h3>${esc(s.name)}</h3>
-    <div class="sub">Roll ${esc(s.roll)}${s.batch?' · '+esc(s.batch):''} · ${esc(s.hostel)} · Now <span class="badge ${s.status}">${s.status}</span></div>
-    <div class="seg"><button class="OUT" data-lt="OUT">🚶 OUT<br><small>Going out</small></button><button class="IN" data-lt="IN">🏠 IN<br><small>Coming back</small></button></div>
-    <label id="rLbl" for="rSel">Reason</label>
-    <select class="inp" id="rSel"><option value="">Choose a reason</option>
-      ${D.reasons.map(r=>`<option>${esc(r)}</option>`).join('')}
-      <option value="__o">📝 Other (type it)</option></select>
-    <input class="inp" id="rTxt" placeholder="Type the reason" maxlength="200" style="margin-top:8px" hidden>
-    <button class="btn" id="logGo"></button>
-    <button class="btn ghost" onclick="closeSheet()">Cancel</button>`);
-  const setLT=t=>{
-    LT=t;
-    $$('[data-lt]').forEach(b=>b.classList.toggle('on',b.dataset.lt===t));
-    $('#rLbl').textContent=t==='OUT'?'Reason (required)':'Reason (optional)';
-    $('#logGo').className='btn '+(t==='OUT'?'red':'green');
-    $('#logGo').textContent=t==='OUT'?'Save as OUT':'Save as IN';
-  };
-  $$('[data-lt]').forEach(b=>b.onclick=()=>setLT(b.dataset.lt));
-  setLT(LT);
-  $('#rSel').onchange=()=>{const o=$('#rSel').value==='__o';$('#rTxt').hidden=!o;if(o)$('#rTxt').focus();};
-  $('#logGo').onclick=async()=>{
-    const r=$('#rSel').value==='__o'?$('#rTxt').value.trim():$('#rSel').value;
-    if(LT==='OUT'&&!r){toast('Choose a reason for going out.',true);return;}
-    try{const res=await run('addLog',T,roll,LT,r);updateStudent(res.student);renderLog();showResult(res,'Saved');}catch(e){}
-  };
-}
-
-function showResult(res,title){
-  const m=encodeURIComponent(res.message), wa=res.whatsapp;
-  openSheet(`<h3>✅ ${esc(title)}</h3><div class="sub">Now inform them on WhatsApp</div>
-    <div class="msg">${esc(res.message)}</div>
-    ${wa?`<a class="btn wa" id="waP" target="_blank" rel="noopener" href="https://wa.me/${esc(wa)}?text=${m}">📲 1. Send to parent</a>`
-        :`<div class="warn">This student has no WhatsApp number. Ask the Admin to add it.</div>`}
-    <a class="btn wa" id="waG" target="_blank" rel="noopener" href="https://wa.me/?text=${m}">👥 2. Send to official group</a>
-    <div class="note">WhatsApp opens with the message ready. For the group button, pick your official group and tap Send.</div>
-    <button class="btn ghost" id="cp">📋 Copy message</button>
-    <button class="btn ghost" onclick="closeSheet()">Done</button>`);
-  ['waP','waG'].forEach(id=>{const a=$('#'+id);if(a)a.addEventListener('click',()=>setTimeout(()=>{if(!a.classList.contains('done')){a.classList.add('done');a.textContent='✓ '+a.textContent;}},400));});
-  $('#cp').onclick=()=>copyText(res.message);
-}
-
-/* ---------- Students tab (admin) ---------- */
-$('#sq').addEventListener('input',renderStudents);
-$('#sBatch').addEventListener('change',renderStudents);
-$('#sflt').addEventListener('click',e=>{const b=e.target.closest('[data-f]');if(b){SFLT=b.dataset.f;renderStudents();}});
-function renderStudents(){
-  const admin=D.role==='Admin';
-  fillBatches($('#sBatch'),D.students);
-  if(['all','none'].indexOf(SFLT)<0&&D.hostels.indexOf(SFLT)<0)SFLT='all';
-  $('#sflt').innerHTML=[['all','All students'],['none','Not in hostel']].concat(D.hostels.map(x=>[x,short(x)]))
-    .map(([v,l])=>`<button data-f="${esc(v)}" class="${SFLT===v?'on':''}">${esc(l)}</button>`).join('');
-  const q=$('#sq').value.trim(), bt=$('#sBatch').value;
-  const list=D.students.filter(s=>(matches(s,q)||(admin&&q&&(s.whatsapp||'').indexOf(q)>=0))&&(!bt||s.batch===bt)
-    &&(SFLT==='all'||(SFLT==='none'?!s.hostel:s.hostel===SFLT)));
-  const inH=D.students.filter(s=>s.hostel).length;
-  $('#sList').innerHTML=`<div class="sub">${D.students.length} students · ${inH} in hostel${list.length!==D.students.length?' · showing '+list.length:''}</div>`+(list.length
-    ? list.slice(0,200).map(s=>`<div class="card"><div class="main">
-        <div class="t">${esc(s.name)}</div>
-        <div class="s">${s.hostel?'<span class="badge H">${esc(short(s.hostel).toUpperCase())}</span> ':''}Roll ${esc(s.roll)}${s.batch?' · '+esc(s.batch):''}${s.hostel&&s.admitted?' · since '+esc(s.admitted):''}${!s.hostel&&s.vacated?' · vacated '+esc(s.vacated):''}</div>
-        ${admin?`<div class="s">💬 ${esc(s.whatsapp||'No number')}</div>`:''}</div>
-        <div class="row-btns">
-          ${s.hostel?(D.hostels.length>1?`<button data-mov="${esc(s.roll)}">Move</button>`:'')+`<button class="vac" data-vac="${esc(s.roll)}">Vacate</button>`:`<button class="adm" data-adm="${esc(s.roll)}">Admit</button>`}
-          ${admin?`<button data-ed="${esc(s.roll)}" aria-label="Edit">✏️</button><button data-del="${esc(s.roll)}" aria-label="Delete">🗑️</button>`:''}</div></div>`).join('')
-      +(list.length>200?`<div class="empty">${list.length-200} more. Search or pick a batch to find them.</div>`:'')
-    : '<div class="empty">No matching students.</div>');
-}
-$('#sList').addEventListener('click',e=>{
-  const b=e.target.closest('button');if(!b)return;
-  if(b.dataset.ed!==undefined)editStudent(b.dataset.ed);
-  else if(b.dataset.del!==undefined)delStudent(b.dataset.del);
-  else if(b.dataset.adm!==undefined)hostelAction(b.dataset.adm,'admit');
-  else if(b.dataset.mov!==undefined)hostelAction(b.dataset.mov,'move');
-  else if(b.dataset.vac!==undefined)hostelAction(b.dataset.vac,'vacate');
-});
-function hostelPicker(exclude){
-  const st=residents();
-  return `<div class="pick">${D.hostels.filter(x=>x!==exclude).map(x=>`<button data-pick="${esc(x)}">${esc(x)}<span>${st.filter(s=>s.hostel===x).length} now</span></button>`).join('')}</div>`;
-}
-function hostelAction(roll,mode){
-  const s=D.students.find(x=>x.roll===roll);if(!s)return;
-  const go=async h=>{
-    try{const res=await run('setHostel',T,roll,h);updateStudent(res.student);renderStudents();
-      showResult(res,mode==='admit'?'Admitted to '+h:mode==='move'?'Moved to '+h:'Vacated');}catch(e){}
-  };
-  if(mode==='vacate'){
-    confirmBox('Vacate from hostel?',s.name+' (Roll '+s.roll+') will leave '+s.hostel+'. Their old logs are kept.','Vacate',()=>go(''));
-    return;
-  }
-  openSheet(`<h3>${mode==='admit'?'Admit to which hostel?':'Move to which hostel?'}</h3>
-    <div class="sub">${esc(s.name)} · Roll ${esc(s.roll)}${s.batch?' · '+esc(s.batch):''}${mode==='move'?' · now in '+esc(s.hostel):''}</div>
-    ${hostelPicker(mode==='move'?s.hostel:'')}
-    <button class="btn ghost" onclick="closeSheet()">Cancel</button>`);
-  $$('[data-pick]').forEach(b=>b.onclick=()=>{closeSheet();go(b.dataset.pick);});
-}
-function admitManySheet(){
-  openSheet(`<h3>🏠 Admit to hostel</h3>
-    <div class="sub">Paste the Roll Nos of the students joining the hostel. One per line, or separated by commas or spaces. No WhatsApp messages are sent for a bulk admit.</div>
-    <label for="amH">Hostel</label>
-    <select class="inp" id="amH">${D.hostels.map(x=>`<option>${esc(x)}</option>`).join('')}</select>
-    <label for="am">Roll Nos</label>
-    <textarea class="inp" id="am" placeholder="202627040&#10;202627081&#10;202627038"></textarea>
-    <div class="note">To admit one student and message the parent, use the Admit button on the student instead.</div>
-    <button class="btn" id="amGo">Admit students</button>
-    <button class="btn ghost" onclick="closeSheet()">Cancel</button>`);
-  $('#amGo').onclick=async()=>{
-    const t=$('#am').value;if(!t.trim()){toast('Paste at least one Roll No.',true);return;}
-    try{
-      const hn=$('#amH').value;
-      const r=await run('admitMany',T,t,hn);D.students=r.students;renderStudents();
-      openSheet(`<h3>✅ ${r.admitted} admitted to ${esc(hn)}</h3>
-        <div class="sub">${r.already?r.already+' were already in this hostel. ':''}${r.missing.length?r.missing.length+' Roll Nos were not found:':''}</div>
-        ${r.missing.length?`<div class="warn">${esc(r.missing.join(', '))}</div>`:''}
-        ${r.other.length?`<div class="sub" style="margin-top:10px">${r.other.length} are in another hostel. Use Move for them:</div><div class="warn">${esc(r.other.join(', '))}</div>`:''}
-        <button class="btn" onclick="closeSheet()">Done</button>`);
-    }catch(e){}
-  };
-}
-function editStudent(roll){
-  const s=roll?D.students.find(x=>x.roll===roll):{roll:'',name:'',phone:'',whatsapp:'',batch:''};
-  const bl=[...new Set(D.students.map(x=>x.batch).filter(Boolean))].sort();
-  openSheet(`<h3>${roll?'✏️ Edit student':'➕ Add student'}</h3>
-    <label for="fRoll">Roll No *</label><input class="inp" id="fRoll" value="${esc(s.roll)}" inputmode="numeric">
-    <label for="fName">Name *</label><input class="inp" id="fName" value="${esc(s.name)}">
-    <label for="fPhone">Phone number</label><input class="inp" id="fPhone" type="tel" value="${esc(s.phone)}" placeholder="9876543210">
-    <label for="fWa">Parent's WhatsApp number</label><input class="inp" id="fWa" type="tel" value="${esc(s.whatsapp)}" placeholder="9876543210">
-    <div class="note">Enter the 10-digit number. The 91 country code is added for you. If WhatsApp is empty, the phone number is used.</div>
-    <label for="fBatch">Batch</label><input class="inp" id="fBatch" value="${esc(s.batch)}" list="batchList">
-    <datalist id="batchList">${bl.map(b=>`<option value="${esc(b)}">`).join('')}</datalist>
-    <button class="btn" id="fSave">Save</button>
-    <button class="btn ghost" onclick="closeSheet()">Cancel</button>`);
-  $('#fSave').onclick=async()=>{
-    try{
-      D.students=await run('saveStudent',T,{roll:$('#fRoll').value,name:$('#fName').value,phone:$('#fPhone').value,whatsapp:$('#fWa').value,batch:$('#fBatch').value},roll||'');
-      closeSheet();renderStudents();toast('Saved');
-    }catch(e){}
-  };
-}
-function delStudent(roll){
-  const s=D.students.find(x=>x.roll===roll);if(!s)return;
-  confirmBox('Delete student?',s.name+' (Roll '+s.roll+') will be removed from the institution list'+(s.hostel?' and the hostel':'')+'. Their old logs are kept.','Delete',async()=>{
-    try{D.students=await run('deleteStudent',T,roll);renderStudents();toast('Deleted');}catch(e){}
-  });
-}
-function importSheet(){
-  openSheet(`<h3>📥 Import students</h3>
-    <div class="sub">Copy rows from Excel or Google Sheets and paste them here.<br>
-    Column order: <b>Roll No, Name, Phone, WhatsApp, Batch</b></div>
-    <textarea class="inp" id="imp" placeholder="202627040, ABDUL BARI MT, 8590747669, 8590747669, NEET"></textarea>
-    <div class="note">An existing Roll No is updated. A header row is skipped. Imported students are not added to the hostel until you admit them.</div>
-    <button class="btn" id="impGo">Import</button>
-    <button class="btn ghost" onclick="closeSheet()">Cancel</button>`);
-  $('#impGo').onclick=async()=>{
-    const t=$('#imp').value;if(!t.trim())return;
-    try{
-      const r=await run('importStudents',T,t);D.students=r.students;closeSheet();renderStudents();
-      toast(`${r.added} added, ${r.updated} updated${r.skipped?', '+r.skipped+' skipped':''}`);
-    }catch(e){}
-  };
-}
-
-/* ---------- Staff tab (admin) ---------- */
-async function loadStaff(){try{STAFF=await run('listStaff',T);renderStaff();}catch(e){}}
-function renderStaff(){
-  $('#stList').innerHTML=STAFF.map(s=>`<div class="card tap" data-sid="${esc(s.id)}"><div class="main">
-      <div class="t">${s.role==='Admin'?'👑 ':'👤 '}${esc(s.name)}</div>
-      <div class="s">${s.role==='Admin'?'Admin · full access':'Staff · can log IN and OUT only'}</div></div>
-      <span class="badge ${s.active?'IN':'OUT'}">${s.active?'ACTIVE':'CANCELLED'}</span></div>`).join('')||'<div class="empty">No staff yet.</div>';
-}
-$('#stList').addEventListener('click',e=>{const c=e.target.closest('[data-sid]');if(c)editStaff(c.dataset.sid);});
-function editStaff(id){
-  const s=id?STAFF.find(x=>x.id===id):{id:'',name:'',role:'Staff',active:true};
-  openSheet(`<h3>${id?'👤 Staff details':'➕ Add staff'}</h3>
-    ${id&&!s.active?'<div class="warn">This PIN is cancelled. Enter a new PIN to reactivate.</div>':''}
-    <label for="tName">Name *</label><input class="inp" id="tName" value="${esc(s.name)}">
-    <label for="tRole">Role</label><select class="inp" id="tRole">
-      <option value="Staff"${s.role==='Staff'?' selected':''}>Staff (log IN and OUT only)</option>
-      <option value="Admin"${s.role==='Admin'?' selected':''}>Admin (full access)</option></select>
-    <label for="tPin">${id?'New PIN (only to change it)':'PIN *'}</label>
-    <input class="inp" id="tPin" type="tel" inputmode="numeric" maxlength="8" placeholder="4 to 8 digits">
-    <div class="note">Each person needs a different PIN. Tell staff their PIN in person.</div>
-    ${!id||s.active?'<button class="btn" id="tSave">Save</button>':''}
-    ${id?(s.active?'<button class="btn red" id="tAct">⛔ Cancel PIN (left the job)</button>':'<button class="btn green" id="tAct">✅ Reactivate with new PIN</button>'):''}
-    <button class="btn ghost" onclick="closeSheet()">Close</button>`);
-  if($('#tSave'))$('#tSave').onclick=async()=>{
-    try{STAFF=await run('saveStaff',T,{id:s.id,name:$('#tName').value,role:$('#tRole').value,pin:$('#tPin').value});closeSheet();renderStaff();toast('Saved');}catch(e){}
-  };
-  if($('#tAct'))$('#tAct').onclick=()=>{
-    if(s.active){
-      confirmBox('Cancel this PIN?',s.name+' will not be able to log in any more. Their past logs are kept.','Cancel PIN',async()=>{
-        try{STAFF=await run('setStaffActive',T,s.id,false,'');renderStaff();toast('PIN cancelled');}catch(e){}
-      });
-    }else{
-      (async()=>{try{STAFF=await run('setStaffActive',T,s.id,true,$('#tPin').value);closeSheet();renderStaff();toast('Reactivated');}catch(e){}})();
+  <script>
+    var frame = document.getElementById('app');
+    var loader = document.getElementById('loader');
+    function hideLoader() {
+      loader.style.opacity = '0';
+      setTimeout(function () { loader.style.display = 'none'; }, 400);
     }
-  };
-}
 
-/* ---------- Report tab (admin) ---------- */
-async function loadLogs(){
-  if(!$('#lDate').value)$('#lDate').value=today();
-  const sel=$('#lHostel'),cur=sel.value;
-  sel.innerHTML='<option value="">All hostels</option>'+D.hostels.map(x=>`<option${x===cur?' selected':''}>${esc(x)}</option>`).join('');
-  try{LOGS=await run('getLogs',T,$('#lDate').value);renderLogs();}catch(e){}
-}
-function renderLogs(){
-  const hf=$('#lHostel').value, L=hf?LOGS.filter(x=>x.hostel===hf):LOGS, c=t=>L.filter(x=>x.type===t).length;
-  const parts=[`${c('OUT')} OUT`,`${c('IN')} IN`];
-  if(c('ADMIT'))parts.push(`${c('ADMIT')} admitted`);if(c('MOVE'))parts.push(`${c('MOVE')} moved`);if(c('VACATE'))parts.push(`${c('VACATE')} vacated`);
-  $('#lList').innerHTML=`<div class="sub">${L.length} entries · ${parts.join(' · ')}</div>`+(L.map(x=>`<div class="card"><div class="main">
-      <div class="t">${esc(x.name)} <span class="s">(Roll ${esc(x.roll)})</span></div>
-      <div class="s">🕒 ${esc(x.time)}${x.hostel?' · '+esc(short(x.hostel)):''}${x.batch?' · '+esc(x.batch):''}${x.reason?' · '+esc(x.reason):''}</div>
-      <div class="s">👤 ${esc(x.by)}</div></div>
-      <span class="badge ${esc(x.type)}">${esc(x.type)}</span></div>`).join('')||'<div class="empty">No entries on this day.</div>');
-}
+    if (!/^https:\/\/script\.google\.com\//.test(APP_URL)) {
+      document.getElementById('nourl').style.display = 'flex';
+      hideLoader();
+    } else {
+      frame.addEventListener('load', hideLoader);
+      frame.src = APP_URL;
+      setTimeout(hideLoader, 10000);
+    }
 
-/* ---------- Settings tab (admin) ---------- */
-function renderSettings(){$('#setName').value=D.hostelName;$('#setHostels').value=D.hostels.join('\n');$('#setReasons').value=D.reasons.join('\n');}
-async function saveSettings(){
-  try{
-    const r=await run('saveSettings',T,{hostelName:$('#setName').value,hostels:$('#setHostels').value.split('\n'),reasons:$('#setReasons').value.split('\n')});
-    D.hostelName=r.hostelName;D.reasons=r.reasons;D.hostels=r.hostels;$('#hTitle').textContent=D.hostelName;renderSettings();toast('Saved');
-  }catch(e){}
-}
+    function checkOnline() {
+      document.getElementById('offline').style.display = navigator.onLine ? 'none' : 'flex';
+    }
+    window.addEventListener('online', function () { location.reload(); });
+    window.addEventListener('offline', checkOnline);
+    checkOnline();
 
-/* ---------- boot ---------- */
-(async function(){
-  renderPin();
-  const t=store.get('hl_token');
-  if(!t){showLogin();return;}
-  T=t;busy(true);
-  try{start(await call('getData',T));}catch(e){showLogin();}finally{busy(false);}
-})();
-</script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      });
+    }
+  </script>
 </body>
 </html>
