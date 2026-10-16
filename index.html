@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ml">
+<head>
+  <meta charset="utf-8">
+  <script>
+    /* ▼▼▼ നിങ്ങളുടെ പുതിയ Apps Script Web App URL ഇവിടെ paste ചെയ്യുക ▼▼▼ */
+    const APP_URL = "PASTE_YOUR_WEB_APP_URL_HERE";
+    /* ▲▲▲ ഇത് മാത്രം മാറ്റിയാൽ മതി ▲▲▲ */
+  </script>
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>HOSTEL LOG 2026–27</title>
+  <meta name="theme-color" content="#1e3a8a">
+  <meta name="description" content="Hostel Log 2026–27">
+  <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/png" href="icon-192.png">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <style>
+    html, body { margin: 0; padding: 0; height: 100%; background: #1e3a8a; overflow: hidden; }
+    #app { position: fixed; inset: 0; width: 100%; height: 100%; border: 0; background: #fff; }
+    #loader {
+      position: fixed; inset: 0; display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 16px;
+      background: #1e3a8a; color: #fff; font-family: system-ui, sans-serif;
+      transition: opacity .4s; z-index: 10;
+    }
+    #loader img { width: 96px; height: 96px; border-radius: 22px; }
+    .spin { width: 32px; height: 32px; border: 4px solid rgba(255,255,255,.3);
+      border-top-color: #fff; border-radius: 50%; animation: s 1s linear infinite; }
+    @keyframes s { to { transform: rotate(360deg); } }
+    .screen { display: none; position: fixed; inset: 0; z-index: 20; flex-direction: column;
+      align-items: center; justify-content: center; font-family: system-ui, sans-serif;
+      text-align: center; padding: 24px; background: #fff; }
+    .screen button { margin-top: 16px; padding: 12px 24px; font-size: 16px; border: 0;
+      border-radius: 8px; background: #1e3a8a; color: #fff; }
+  </style>
+</head>
+<body>
+  <div id="loader">
+    <img src="icon-192.png" alt="">
+    <div style="font-weight:600;font-size:18px">HOSTEL LOG 2026–27</div>
+    <div class="spin"></div>
+  </div>
+
+  <div id="offline" class="screen">
+    <div style="font-size:48px">📶</div>
+    <h2>ഇന്റർനെറ്റ് ഇല്ല</h2>
+    <p>കണക്ഷൻ പരിശോധിച്ച് വീണ്ടും ശ്രമിക്കൂ.</p>
+    <button onclick="location.reload()">വീണ്ടും ശ്രമിക്കൂ</button>
+  </div>
+
+  <div id="nourl" class="screen">
+    <div style="font-size:48px">⚙️</div>
+    <h2>App URL ചേർത്തിട്ടില്ല</h2>
+    <p>index.html-ൽ APP_URL എന്ന സ്ഥലത്ത് Apps Script Web App ലിങ്ക് paste ചെയ്യുക.</p>
+  </div>
+
+  <iframe id="app" title="HOSTEL LOG 2026–27"
+    allow="clipboard-read; clipboard-write; fullscreen"></iframe>
+
+  <script>
+    var frame = document.getElementById('app');
+    var loader = document.getElementById('loader');
+    function hideLoader() {
+      loader.style.opacity = '0';
+      setTimeout(function () { loader.style.display = 'none'; }, 400);
+    }
+
+    if (!/^https:\/\/script\.google\.com\//.test(APP_URL)) {
+      document.getElementById('nourl').style.display = 'flex';
+      hideLoader();
+    } else {
+      frame.addEventListener('load', hideLoader);
+      frame.src = APP_URL;
+      setTimeout(hideLoader, 10000);
+    }
+
+    function checkOnline() {
+      document.getElementById('offline').style.display = navigator.onLine ? 'none' : 'flex';
+    }
+    window.addEventListener('online', function () { location.reload(); });
+    window.addEventListener('offline', checkOnline);
+    checkOnline();
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function () {
+        navigator.serviceWorker.register('sw.js').catch(function () {});
+      });
+    }
+  </script>
+</body>
+</html>
